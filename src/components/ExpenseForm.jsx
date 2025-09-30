@@ -5,18 +5,37 @@ export default function ExpenseForm({ setExpenses }) {
     //React support one way data binding.
     //Using useState we create controlled components
     //Controlled components required noChange() event to update values.
-    const [title, setTitle] = useState('');
-    const [category, setCategory] = useState('');
-    const [amount, setAmount] = useState('');
+
+    const [expense, setExpense] = useState({
+        title: '',
+        category: '',
+        amount: '',
+    })
+
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        const expense = { title, category, amount, id: crypto.randomUUID() } //crypto.randomUUID() generate random id 
-        setExpenses((prevState) => [...prevState, expense])
-        setTitle('');
-        setCategory('');
-        setAmount('');
+        //crypto.randomUUID() generate random id 
+        setExpenses((prevState) => [...prevState, { ...expense, id: crypto.randomUUID() }])
+        setExpense({
+            title: '',
+            category: '',
+            amount: '',
+        })
     }
+
+    /*
+    The `handleChange` function updates the `expense` state with the new value based on the input
+    field name.
+     */
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setExpense((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }))
+    }
+
 
     return (
         <form className="expense-form" onSubmit={handleSubmit}>
@@ -25,8 +44,9 @@ export default function ExpenseForm({ setExpenses }) {
                 <input
                     id="title"
                     name="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={expense.title}
+                    onChange={handleChange}
+                    required
                 />
             </div>
             <div className="input-container">
@@ -34,8 +54,9 @@ export default function ExpenseForm({ setExpenses }) {
                 <select
                     id="category"
                     name="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    value={expense.category}
+                    onChange={handleChange}
+                    required
                 >
                     <option value="" hidden>
                         Select Category
@@ -52,8 +73,9 @@ export default function ExpenseForm({ setExpenses }) {
                 <input
                     id="amount"
                     name="amount"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={expense.amount}
+                    onChange={handleChange}
+                    required
                 />
             </div>
             <button className="add-btn">Add</button>
