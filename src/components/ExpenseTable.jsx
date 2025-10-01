@@ -1,13 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useFilter } from '../hooks/useFilter';
 
 export default function ExpenseTable({ expenses }) {
+
+  // const [category, setCategory] = useState('');
+  // const filteredData = expenses.filter((expense) => expense.category.toLowerCase().includes(category));
+  // console.log(filteredData);
+
+  /* The line `const [setQuary, filteredData] = useFilter(expenses, (data)=> data.category);` is using
+  a custom hook called `useFilter` to filter the `expenses` data based on the category. */
+  const [setQuary, filteredData] = useFilter(expenses, (data) => data.category);
+
+  const total = filteredData.reduce((accumulator, current) => accumulator + current.amount, 0);
+
   return (
     <table className="expense-table">
       <thead>
         <tr>
           <th>Title</th>
           <th>
-            <select>
+            <select onChange={(e) => setQuary(e.target.value)}>
               <option value="">All</option>
               <option value="grocery">Grocery</option>
               <option value="clothes">Clothes</option>
@@ -42,7 +54,7 @@ export default function ExpenseTable({ expenses }) {
         </tr>
       </thead>
       <tbody>
-        {expenses.map(({id, title, category, amount}) => (
+        {filteredData.map(({ id, title, category, amount }) => (
           <tr key={id}>
             <td>{title}</td>
             <td>{category}</td>
@@ -52,7 +64,7 @@ export default function ExpenseTable({ expenses }) {
         <tr>
           <th>Total</th>
           <th></th>
-          <th>₹8100</th>
+          <th>₹{total}</th>
         </tr>
       </tbody>
     </table>
