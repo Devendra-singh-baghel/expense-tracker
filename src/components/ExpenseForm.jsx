@@ -2,18 +2,20 @@ import React, { useEffect, useRef, useState } from 'react'
 import Input from './Input'
 import Select from './Select'
 
-export default function ExpenseForm({ setExpenses }) {
+export default function ExpenseForm({
+    setExpenses,
+    setExpense,
+    expense,
+    editableRow,
+    setEditableRow
+}) {
 
 
     //React support one way data binding.
     //Using useState we create controlled components
-    //Controlled components required noChange() event to update values.
+    //Controlled components required onChange() event to update values.
 
-    const [expense, setExpense] = useState({
-        title: '',
-        category: '',
-        amount: '',
-    })
+
 
     const [errors, setErrors] = useState({})
 
@@ -23,7 +25,10 @@ export default function ExpenseForm({ setExpenses }) {
             { minLength: 5, message: 'Title should be at least 5 characters long' },
         ],
         category: [{ required: true, message: 'Please select a category' }],
-        amount: [{ required: true, message: 'Please enter an amount' }],
+        amount: [
+            { required: true, message: 'Please enter an amount' },
+            { pattern: /^[0-9]+(\.[0-9]+)?$/, message: 'Please enter a valid number' }
+        ],
     }
 
     const validate = (formData) => {
@@ -37,6 +42,11 @@ export default function ExpenseForm({ setExpenses }) {
                 }
 
                 if (rule.minLength && value.length < 5) {
+                    errorsData[key] = rule.message
+                    return true
+                }
+
+                if (rule.pattern && !rule.pattern.test(value)) {
                     errorsData[key] = rule.message
                     return true
                 }
@@ -54,6 +64,28 @@ export default function ExpenseForm({ setExpenses }) {
 
         if (Object.keys(validateResult).length) return
 
+        /* This block of code is handling the case where the form is in edit mode (`editableRow` is
+        truthy). */
+        if (editableRow) {
+            setExpenses((prevState) =>
+                prevState.map((prevExpense) => {
+                    if (prevExpense.id === editableRow) {
+                        return { ...expense, id: editableRow }
+                    }
+                    return prevExpense
+                })
+            )
+            setExpense({
+                title: '',
+                category: '',
+                amount: '',
+            })
+            setEditableRow('');
+            return
+        }
+
+        /* This block of code is adding a new expense object to the existing
+        array of expenses. */
         setExpenses((prevState) => [
             ...prevState,
             { ...expense, id: crypto.randomUUID() },
@@ -105,7 +137,7 @@ export default function ExpenseForm({ setExpenses }) {
                 onChange={handleChange}
                 error={errors.amount}
             />
-            <button className="add-btn">Add</button>
+            <button className="add-btn">{editableRow ? "Save" : "Add"}</button>
         </form>
     )
 }

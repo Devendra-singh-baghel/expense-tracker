@@ -2,13 +2,19 @@ import React, { useState } from 'react'
 import { useFilter } from '../hooks/useFilter';
 import ContextMenu from './ContextMenu'
 
-export default function ExpenseTable({ expenses, setExpenses }) {
+export default function ExpenseTable({
+  expenses,
+  setExpenses,
+  setExpense,
+  editableRow,
+  setEditableRow
+}) {
 
   /* The line `const [setQuary, filteredData] = useFilter(expenses, (data)=> data.category);` is using
   a custom hook called `useFilter` to filter the `expenses` data based on the category. */
   const [setQuary, filteredData] = useFilter(expenses, (data) => data.category);
 
-  const total = filteredData.reduce((accumulator, current) => accumulator + current.amount, 0);
+  const total = filteredData.reduce((accumulator, current) => accumulator + parseFloat(current.amount), 0);
 
   const [menuPosition, setMenuPosition] = useState({});
   const [rowId, setRowId] = useState('');
@@ -27,9 +33,13 @@ export default function ExpenseTable({ expenses, setExpenses }) {
         menuPosition={menuPosition}
         setMenuPosition={setMenuPosition}
         setExpenses={setExpenses}
+        expenses={expenses}
         rowId={rowId}
+        setExpense={setExpense}
+        editableRow={editableRow}
+        setEditableRow={setEditableRow}
       />
-      
+
       <table className="expense-table" onContextMenu={(e) => e.preventDefault()}>
         <thead>
           <tr>
@@ -80,7 +90,7 @@ export default function ExpenseTable({ expenses, setExpenses }) {
           <tr>
             <th>Total</th>
             <th></th>
-            <th>₹{total}</th>
+            <th>₹{total.toFixed(2)}</th>
           </tr>
         </tbody>
       </table>

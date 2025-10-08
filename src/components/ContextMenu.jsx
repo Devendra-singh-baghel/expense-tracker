@@ -1,6 +1,14 @@
 import React, { useEffect, useRef } from 'react'
 
-export default function ContextMenu({ menuPosition, setMenuPosition, setExpenses, rowId }) {
+export default function ContextMenu({
+  menuPosition,
+  setMenuPosition,
+  setExpenses,
+  expenses,
+  rowId,
+  setExpense,
+  setEditableRow
+}) {
 
   const menuRef = useRef();
 
@@ -23,13 +31,25 @@ export default function ContextMenu({ menuPosition, setMenuPosition, setExpenses
   }, [menuPosition]);
 
 
+  /*
+    The handleDelete function filters out an expense with a specific id from the expenses array and
+    resets the menu position.
+   */
   const handleDelete = () => {
     setExpenses((prev) => prev.filter((expense) => expense.id !== rowId))
     setMenuPosition({});
   };
 
+  /*
+    The `handleEdit` function resets the menu position, retrieves specific expense data based on the
+    row ID, and sets the retrieved data as the editable expense row.
+   */
   const handleEdit = () => {
     setMenuPosition({});
+
+    const { title, category, amount } = expenses.find((exp) => exp.id === rowId);
+    setExpense({ title, category, amount });
+    setEditableRow(rowId);
   };
 
   //Close ContextMenu when position are null/empty
